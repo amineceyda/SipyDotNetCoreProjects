@@ -20,4 +20,6 @@ AccessLevel: Required field that must be a value between 1 and 5 (inclusive).
 Salary: Required field that must be within the allowed limit based on the staff person's access level.
 
 ## TodoApi
-TodoApi project created following Microsoft's Tutorial: [Create A web API with ASP.NET Core]([URL](https://learn.microsoft.com/en-us/aspnet/core/tutorials/first-web-api?view=aspnetcore-6.0)https://learn.microsoft.com/en-us/aspnet/core/tutorials/first-web-api?view=aspnetcore-6.0)
+TodoApi project created following Microsoft's Tutorial: Create A web API with ASP.NET Core
+
+[Link](https://learn.microsoft.com/en-us/aspnet/core/tutorials/first-web-api?view=aspnetcore-6.0&tabs=visual-studio)
