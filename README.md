@@ -42,18 +42,22 @@ The QuoteApi exposes the following endpoints:
 The API returns quotes in the following format:
 
 #### json
+```
 {
   "id": 1,
   "author": "Albert Einstein",
   "text": "Imagination is more important than knowledge."
 }
+```
 ### Example JSON Patch Document
 The JSON Patch document should contain one or more operations (add, remove, replace, etc.) that specify the changes to be applied to the quote. 
 Here's an example:
 
 #### json
+```
 [
   { "op": "replace", "path": "/author", "value": "New Author" },
   { "op": "add", "path": "/tags", "value": ["inspirational", "motivational"] },
   { "op": "remove", "path": "/isFeatured" }
 ]
+```
