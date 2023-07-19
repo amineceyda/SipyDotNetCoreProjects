@@ -61,3 +61,7 @@ Here's an example:
   { "op": "remove", "path": "/isFeatured" }
 ]
 ```
+## BookStoreApi
+This is a simple ASP.NET Core API that book store simulation. Developed together with Patika.dev .Net Core tutorial.
+
+[Link](https://academy.patika.dev/courses/net-core)
