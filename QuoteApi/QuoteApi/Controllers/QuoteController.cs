@@ -30,6 +30,15 @@ namespace QuoteApi.Controllers
             new Quote { Id = 10, Author = "Mark Twain", Text = "The secret of getting ahead is getting started." }
         };
 
+
+        //For list the quotes alphabetically by author name
+        [HttpGet("list")]
+        public ActionResult<IEnumerable<Quote>> ListQuotes()
+        {
+            var sortedQuotes = quotes.OrderBy(q => q.Author).ToList();
+            return Ok(sortedQuotes);
+        }
+
         //For read all quotes
         [HttpGet]
         public ActionResult<IEnumerable<Quote>> GetAllQuotes()
@@ -52,14 +61,30 @@ namespace QuoteApi.Controllers
 
         //For post new quote
         [HttpPost]
-        public ActionResult<Quote> AddQuote(Quote newQuote)
+        public IActionResult AddQuote([FromBody] Quote newQuote)
         {
-            newQuote.Id = quotes.Count + 1;
+            if (newQuote == null)
+            {
+                return BadRequest("Invalid quote data.");
+            }
+
+            // Validatation for quote object
+            if (string.IsNullOrEmpty(newQuote.Author) || string.IsNullOrEmpty(newQuote.Text))
+            {
+                return BadRequest("Author and Text fields are required.");
+            }
+
+            // Generate ID for the new quote //increment the highest current ID // Prevent to conflict when delete work
+            int newId = quotes.Count > 0 ? quotes.Max(q => q.Id) + 1 : 1;
+            newQuote.Id = newId;
+
+            // Add the new quote to the quotes collection
             quotes.Add(newQuote);
 
-            //When it is success return 201
+            // Return 201 Created status along with the newly created quote
             return CreatedAtAction(nameof(GetQuoteById), new { id = newQuote.Id }, newQuote);
         }
+
 
         //For update quote
         [HttpPut("{id}")]
@@ -118,6 +143,7 @@ namespace QuoteApi.Controllers
             return NoContent();
         }
 
+        
         //To do List
 
         // Get a random quote
