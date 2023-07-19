@@ -30,9 +30,10 @@ The QuoteApi is a RESTful API that provides a collection of inspiring quotes. It
 ### Endpoints
 The QuoteApi exposes the following endpoints:
 
+- GET /api/quote/list: list all quotes that sorted alphabetically based on the author's name.
 - GET /api/quotes: Retrieves all quotes.
 - GET /api/quotes/{id}: Retrieves a specific quote by ID.
-- POST /api/quotes: Adds a new quote to the collection.
+- POST /api/quotes: Adds a new quote to the collection. (with basic validation)
 - PUT /api/quotes/{id}: Updates an existing quote by ID.
 - PATCH /api/quotes/{id}: Partially updates an existing quote by ID using JSON Patch.
 - DELETE /api/quotes/{id}: Deletes a quote by ID.
