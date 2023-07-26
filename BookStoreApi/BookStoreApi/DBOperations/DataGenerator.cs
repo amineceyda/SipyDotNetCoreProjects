@@ -19,7 +19,7 @@ namespace BookStoreApi.DBOperations
                 context.Books.AddRange(
                     new Book
                     {
-                        Id = 1,
+                       // Id = 1,
                         Title = "Lean Startup",
                         AuthorId = 1,
                         GenreId = 1,
@@ -28,7 +28,7 @@ namespace BookStoreApi.DBOperations
                     },
                      new Book
                      {
-                         Id = 2,
+                        // Id = 2,
                          Title = "The Alchemist",
                          AuthorId = 2, //Paulo Coelho
                          GenreId = 2, // Fiction
@@ -37,7 +37,7 @@ namespace BookStoreApi.DBOperations
                      },
                      new Book
                      {
-                         Id = 3,
+                        // Id = 3,
                          Title = "Harry Potter and the Sorcerer's Stone",
                          AuthorId = 3, //J.K. Rowling
                          GenreId = 3, // Fantasy
@@ -46,7 +46,7 @@ namespace BookStoreApi.DBOperations
                      },
                       new Book
                       {
-                          Id = 4,
+                         // Id = 4,
                           Title = "To Kill a Mockingbird",
                           AuthorId = 4,//Harper Lee
                           GenreId = 4,// Classic
@@ -55,7 +55,7 @@ namespace BookStoreApi.DBOperations
                       },
                       new Book
                       {
-                          Id = 5,
+                        //  Id = 5,
                           Title = "1984",
                           AuthorId = 5, //George Orwell
                           GenreId = 5, // Dystopian
@@ -64,7 +64,7 @@ namespace BookStoreApi.DBOperations
                       },
                       new Book
                       {
-                          Id = 6,
+                        //  Id = 6,
                           Title = "The Great Gatsby",
                           AuthorId = 6, //F. Scott Fitzgerald
                           GenreId = 4, // Classic

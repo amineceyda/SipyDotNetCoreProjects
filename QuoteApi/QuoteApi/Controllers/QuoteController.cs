@@ -1,153 +1,137 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.JsonPatch; //for patch
+using QuoteApi.Entities;
+using QuoteApi.DbOperations;
+using QuoteApi.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace QuoteApi.Controllers
 {
-    public class Quote
-    {
-        public int Id { get; set; }
-        public string? Author { get; set; }
-        public string? Text { get; set; }
-    }
+ 
 
     [Route("api/[controller]s")]
     [ApiController]
     public class QuoteController : ControllerBase
     {
-        //Sample data 
-        private readonly List<Quote> quotes = new List<Quote>
-        {
-            new Quote { Id = 1, Author = "Albert Einstein", Text = "Imagination is more important than knowledge." },
-            new Quote { Id = 2, Author = "Nelson Mandela", Text = "The greatest glory in living lies not in never falling, but in rising every time we fall." },
-            new Quote { Id = 3, Author = "Maya Angelou", Text = "You may not control all the events that happen to you, but you can decide not to be reduced by them." },
-            new Quote { Id = 4, Author = "Steve Jobs", Text = "Your time is limited, don't waste it living someone else's life." },
-            new Quote { Id = 5, Author = "Eleanor Roosevelt", Text = "The future belongs to those who believe in the beauty of their dreams." },
-            new Quote { Id = 6, Author = "Walt Disney", Text = "All our dreams can come true, if we have the courage to pursue them." },
-            new Quote { Id = 7, Author = "Confucius", Text = "It does not matter how slowly you go as long as you do not stop." },
-            new Quote { Id = 8, Author = "Thomas Edison", Text = "I have not failed. I've just found 10,000 ways that won't work." },
-            new Quote { Id = 9, Author = "Oprah Winfrey", Text = "Turn your wounds into wisdom." },
-            new Quote { Id = 10, Author = "Mark Twain", Text = "The secret of getting ahead is getting started." }
-        };
+        internal readonly QuoteDbContext _context; //I change the private to internal for the access process on the extensions but ı am not sure is it true??
 
-
-        //For list the quotes alphabetically by author name
-        [HttpGet("list")]
-        public ActionResult<IEnumerable<Quote>> ListQuotes()
+        public QuoteController(QuoteDbContext context)
         {
-            var sortedQuotes = quotes.OrderBy(q => q.Author).ToList();
-            return Ok(sortedQuotes);
+            _context = context;
         }
-
-        //For read all quotes
+        /* I tried to fake authorization but ı couldn't set the program.cs
+         * 
+        // This action requires the user to be logged in
         [HttpGet]
-        public ActionResult<IEnumerable<Quote>> GetAllQuotes()
+        [Authorize(Policy = "FakeAuthorizationPolicy")]
+        public IActionResult Get()
         {
-            return quotes;
+            // Your logic here
+            return Ok("This is a protected endpoint.");
         }
+        */
 
-        //For read single quote // from router body etc. api/quote/1
+        //Get
+        [HttpGet]
+        public List<Quote> GetAll() {
+            var quotes = _context.Quotes.OrderBy(x => x.Id).ToList<Quote>(); //Linq
+            
+            return quotes;
+           
+        }
+        //GetById
         [HttpGet("{id}")]
-        public ActionResult<Quote> GetQuoteById(int id)
+        public Quote GetById(int id)
         {
-
-            var quote = quotes.Find(q => q.Id == id);//lamda
-            if (quote == null)
-            {
-                return NotFound();
-            }
+            var quote = _context.Quotes.Where(x => x.Id == id).SingleOrDefault();
+           
             return quote;
         }
-
-        //For post new quote
+        //Post
         [HttpPost]
         public IActionResult AddQuote([FromBody] Quote newQuote)
         {
-            if (newQuote == null)
+            var quote = _context.Quotes.SingleOrDefault(x=> x.Text == newQuote.Text);
+            if (quote is not null)
             {
-                return BadRequest("Invalid quote data.");
+                return BadRequest();
             }
-
-            // Validatation for quote object
-            if (string.IsNullOrEmpty(newQuote.Author) || string.IsNullOrEmpty(newQuote.Text))
-            {
-                return BadRequest("Author and Text fields are required.");
-            }
-
-            // Generate ID for the new quote //increment the highest current ID // Prevent to conflict when delete work
-            int newId = quotes.Count > 0 ? quotes.Max(q => q.Id) + 1 : 1;
-            newQuote.Id = newId;
-
-            // Add the new quote to the quotes collection
-            quotes.Add(newQuote);
-
-            // Return 201 Created status along with the newly created quote
-            return CreatedAtAction(nameof(GetQuoteById), new { id = newQuote.Id }, newQuote);
+            _context.Quotes.Add(newQuote);
+            _context.SaveChanges();
+            return Ok();
         }
-
-
-        //For update quote
+        //Put
         [HttpPut("{id}")]
-        public IActionResult UpdateQuote(int id, Quote updatedQuote)
-        {
-            var index = quotes.FindIndex(q => q.Id == id);
-            if (index == -1)
+        public IActionResult UpdateQuote(int id, [FromBody] Quote updatedQuote) {
+            var quote = _context.Quotes.SingleOrDefault(x=> x.Id==id);
+            if(quote is null)
             {
-                return NotFound();//for 404
+                return BadRequest();
+            }
+            quote.Text = updatedQuote.Text == default ? quote.Text : updatedQuote.Text;
+            quote.Author = updatedQuote.Author == default ? quote.Author : updatedQuote.Author;
+           
+            _context.SaveChanges();
+            return Ok();
+        }
+        //Delete
+        [HttpDelete("{id}")]
+        public IActionResult DeleteQuote(int id)
+        {
+            var quote = _context.Quotes.SingleOrDefault(x=> x.Id==id);
+            if (quote is null)
+            {
+                return BadRequest();
             }
 
-            updatedQuote.Id = id;
-            quotes[index] = updatedQuote;
-
-            return NoContent();
+            _context.Quotes.Remove(quote);
+            _context.SaveChanges();
+            return Ok();
         }
 
-        //For update partially content in quote
+        // Patch
         [HttpPatch("{id}")]
-        public IActionResult PartiallyUpdateQuote(int id, Microsoft.AspNetCore.JsonPatch.JsonPatchDocument<Quote> patchDocument)
+        public IActionResult PatchQuote(int id, [FromBody] JsonPatchDocument<Quote> patchDoc)
         {
-            var quote = quotes.Find(q => q.Id == id);
-            if (quote == null)
+            var quote = _context.Quotes.SingleOrDefault(x => x.Id == id);
+            if (quote is null)
             {
-                return NotFound();
+                return BadRequest();
             }
 
-            patchDocument.ApplyTo(quote, ModelState);
+            patchDoc.ApplyTo(quote, ModelState);
 
-            if (!ModelState.IsValid)
+            if (!TryValidateModel(quote))
             {
                 return BadRequest(ModelState);
             }
 
-            return NoContent();
+            _context.SaveChanges();
+            return Ok();
         }
-
-        //For delete quote
-        [HttpDelete("{id}")]
-        public IActionResult DeleteQuote(int id)
-        {
-            var quote = quotes.Find(q => q.Id == id);
-            if (quote == null)
-            {
-                return NotFound();
-            }
-
-            quotes.Remove(quote);
-
-            // Update the IDs of quotes
-            for (int i = id - 1; i < quotes.Count; i++)
-            {
-                quotes[i].Id = i + 1;
-            }
-
-            return NoContent();
-        }
-
-        
-        //To do List
 
         // Get a random quote
+        [HttpGet("random")]
+        public Quote GetRandomQuote()
+        {
+            var count = _context.Quotes.Count();
+            var random = new Random();
+            var randomId = random.Next(1, count + 1);
+            var quote = _context.Quotes.FirstOrDefault(x => x.Id == randomId);
+
+            return quote;
+        }
+
 
         // Get quotes by author
+        [HttpGet("byauthor/{author}")]
+        public List<Quote> GetQuotesByAuthor(string author)
+        {
+            var quotes = _context.Quotes.Where(x => x.Author.ToLower() == author.ToLower()).ToList();//linq
+   
+            return quotes;
+        }
+
     }
 }

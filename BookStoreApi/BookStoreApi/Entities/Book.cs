@@ -1,7 +1,11 @@
-﻿namespace BookStoreApi.Entities
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace BookStoreApi.Entities
 {
     public class Book
     {
+
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]//Aouto id 
         public int Id { get; set; }
         public string Title { get; set; }
 
