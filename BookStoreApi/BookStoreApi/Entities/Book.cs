@@ -8,12 +8,10 @@ namespace BookStoreApi.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]//Aouto id 
         public int Id { get; set; }
         public string Title { get; set; }
-
-        public int AuthorId { get; set; } // This property refers to the Author's Id
-        public int GenreId { get; set; } // This property refers to the Genre's Id
-
         public int PageCount { get; set; }
         public DateTime PublishDate { get; set; }
+
+        public int GenreId { get; set; }    
 
     }
 }
