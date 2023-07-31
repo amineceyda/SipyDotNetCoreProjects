@@ -27,6 +27,7 @@ namespace BookStoreApi.BookOperations.CreateBooks
             }
 
             book = _mapper.Map<Book>(Model); //Bu alttaki işlemleri otamatik yapar 
+
             //Ya da gelen modeli book objesine dönüştürür diyelim
             //book = new Entities.Book();
             /*
