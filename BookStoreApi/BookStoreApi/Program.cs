@@ -1,4 +1,5 @@
 using BookStoreApi.DBOperations; // Add the namespace where DataGenerator and BookStoreDbContext are located
+using BookStoreApi.Middlewares;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
@@ -31,6 +32,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseAuthorization();
+
+app.UseCustomExceptionMiddleware();//custom middleware
+
 
 app.MapControllers();
 
