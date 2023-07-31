@@ -1,4 +1,6 @@
-﻿using BookStoreApi.DBOperations;
+﻿using AutoMapper;
+using BookStoreApi.DBOperations;
+using BookStoreApi.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookStoreApi.BookOperations.CreateBooks
@@ -6,11 +8,15 @@ namespace BookStoreApi.BookOperations.CreateBooks
     public class CreateBookCommand
     {
         public CreateBookModel Model { get; set; }
-
+        
         private readonly BookStoreDbContext _dbContext;
-       public CreateBookCommand(BookStoreDbContext dbContext) {
+
+        private readonly IMapper _mapper;
+        public CreateBookCommand(BookStoreDbContext dbContext, IMapper mapper)
+        {
             _dbContext = dbContext;
-       }   
+            _mapper = mapper;
+        }
 
         public void Handle()
         {
@@ -19,12 +25,18 @@ namespace BookStoreApi.BookOperations.CreateBooks
             {
                 throw new InvalidOperationException("Kitap zaten mevcut");
             }
-            book = new Entities.Book();
 
+            book = _mapper.Map<Book>(Model); //Bu alttaki işlemleri otamatik yapar 
+            //Ya da gelen modeli book objesine dönüştürür diyelim
+            //book = new Entities.Book();
+            /*
+            //Bu bizim normal mapper işlemlerimizdi.AutoMapper ile otamatikleştirdik
             book.Title = Model.Title;
             book.PublishDate = Model.PublisDate;
             book.PageCount = Model.PageCount;
-            book.GenreId = Model.GenreId;
+            book.GenreId = Model.GenreId;*/ //Yani buna ihtiyaç yok artık onun yerine
+
+
 
             _dbContext.Books.Add(book);
             _dbContext.SaveChanges();

@@ -1,4 +1,5 @@
-﻿using BookStoreApi.Common;
+﻿using AutoMapper;
+using BookStoreApi.Common;
 using BookStoreApi.DBOperations;
 using BookStoreApi.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -8,9 +9,11 @@ namespace BookStoreApi.BookOperations.GetBooks
     public class GetBooksQuery
     {
         private readonly BookStoreDbContext _dbContext;
-
-        public GetBooksQuery(BookStoreDbContext dbContext) {
+        private readonly IMapper _mapper;
+        public GetBooksQuery(BookStoreDbContext dbContext, IMapper mapper)
+        {
             _dbContext = dbContext;
+            _mapper = mapper;
         }
 
         public List<BooksViewModel> Handle()
@@ -18,6 +21,10 @@ namespace BookStoreApi.BookOperations.GetBooks
             var bookList = _dbContext.Books.OrderBy(x => x.Id).ToList<Book>();//LinQ
             //gelen veriyi view modele dönüştürmelisin burda
 
+            List<BooksViewModel> viewModel = _mapper.Map<List<BooksViewModel>>(bookList);
+
+            /* Her kitap için dönüşüm yapıyorduk buna gerek yok şimdi
+            
             List<BooksViewModel> viewModel = new List<BooksViewModel>();
 
             foreach (var book in bookList)
@@ -30,7 +37,7 @@ namespace BookStoreApi.BookOperations.GetBooks
                     PublishDate = book.PublishDate.Date.ToString("dd/MM/yyy"),
 
                 });
-            }
+            }*/
             return viewModel;
         }
     }
